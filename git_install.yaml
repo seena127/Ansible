@@ -1,0 +1,34 @@
+---
+- name: Ensuring git is installed
+  hosts: production
+  become: true
+  tasks:
+    - name: Git Verification
+      command: git --version
+      #saving the output of the command to variable git_version using register and is used using debug command
+      register: git_version
+      ignore_errors: yes
+    - name: git installation
+      apt:
+        name: git
+        state: present
+      when: git_version.rc != 0 #only run the task if git is not installed
+
+    - name: Git configuration
+      command: git config --global {{item.key}} "{{item.value}}"
+      with_items:
+        - {key: "user.name", value: "seena127"}
+        - {key: "user.email", value: "bsreenu1999@gmail.com"}
+      when: git_version.rc != 0
+      notify:
+        - verify
+        - display
+  handlers:
+    - name: verify
+      command: git --version
+      register: git_ver
+      when: git_version.rc != 0
+    - name: display
+      debug:
+        msg: "Git is installed with version {{ git_ver.stdout }}"
+      when: git_ver is defined
