@@ -1,9 +1,9 @@
-handlers:
-  - name: verify
-    command: git --version
-    register: git_ver
-    when: git_version.rc != 0
-  - name: display
-    debug:
-      msg: "Git is installed with version {{ git_ver.stdout }}"
-    when: git_ver is defined
+
+- name: verify
+  command: git --version
+  register: git_ver
+  when: git_version.rc != 0
+- name: display
+  debug:
+    msg: "Git is installed with version {{ git_ver.stdout }}"
+  when: git_ver is defined
