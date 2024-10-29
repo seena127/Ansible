@@ -1,0 +1,24 @@
+---
+- hosts: localhost
+  connection: local
+  vars:
+    ansible_python_interpreter: "/home/ubuntu/myenv/bin/python3"
+  tasks:
+  - name:  start ec2 instance with public ip address
+    amazon.aws.ec2_instance:
+      name: "{{item.name}}"
+      key_name: "devops_practice"
+      instance_type: t2.micro
+      security_group: default
+      region: us-east-1
+      aws_access_key: "{{ec2_access_key}}" #take value from vault
+      aws_secret_key: "{{ec2_secret_key}}" #take value from vault
+      network_interfaces:
+        - assign_public_ip: true
+      image_id: "{{ item.image }}" 
+      tags:
+        Environment: ansible-testing
+    loop:
+      - { image: "ami-06b21ccaeff8cd686", name: "managed-node-linux" }
+      - { image: "ami-0866a3c8686eaeeba", name: "managed-node-ubuntu"}
+      - { image: "ami-0583d8c7a9c35822c", name: "managed-node-redhat"}
