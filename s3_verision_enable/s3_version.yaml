@@ -1,0 +1,39 @@
+---
+- name: enforce s3 bucket versioning
+  hosts: localhost
+  gather_facts: false
+  vars:
+    no_version: []
+  tasks:
+    - name: list s3 buckets in aws account
+      amazon.aws.s3_bucket_info:
+        aws_access_key: "{{ aws_access }}"
+        aws_secret_key: "{{ aws_secret }}"
+      register: result
+    - name: print s3 buckets
+      debug:
+        var: result
+    - name: identifying buckets
+      amazon.aws.s3_bucket:
+        aws_access_key: "{{aws_access}}"
+        aws_secret_key: "{{ aws_secret}}"
+        name: "{{ item.name}}"
+      loop: "{{ result.buckets }}"
+      register: bucket_info
+      ignore_errors: yes
+    - debug:
+        var: bucket_info
+    - name: check for buckets without versioning enabled
+      set_fact:
+        no_version: "{{no_version | default([])+[item.name] }}"
+      loop: "{{bucket_info.results}}"
+      when: item.versioning is not defined or item.versioning.Versioning != 'Enabled'
+
+    - name: Enabling version in s3 buckets
+      amazon.aws.s3_bucket:
+        name: "{{item}}"
+        aws_access_key: "{{ aws_access }}"
+        aws_secret_key: "{{ aws_secret }}"
+        versioning: yes
+      loop: "{{no_version}}"
+      when: no_version | length>0
