@@ -39,6 +39,9 @@ ansible-playbook ec2_stop.yml -i ec2.ini --vault-password-file vault.pass
 4) Ansible vault can be integrated with parameter store by changing ansible vault as
 
 ansible-vault view group_vars/all/pass.yml --vault-password-file vault.pass
+
+
 aws_access:  "{{ lookup('amazon.aws.aws_ssm', 'access_key', region='us-east-1') }}"
+
 aws_secret:  "{{ lookup('amazon.aws.aws_ssm', 'secret_key', region='us-east-1') }}"
 
