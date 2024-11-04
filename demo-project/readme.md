@@ -45,3 +45,4 @@ aws_access:  "{{ lookup('amazon.aws.aws_ssm', 'access_key', region='us-east-1') 
 
 aws_secret:  "{{ lookup('amazon.aws.aws_ssm', 'secret_key', region='us-east-1') }}"
 
+Make sure the user has necessary permissions
